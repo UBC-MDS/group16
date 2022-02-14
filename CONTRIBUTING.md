@@ -40,7 +40,7 @@ If you are proposing a feature:
 
 ## Get Started!
 
-Ready to contribute? Here's how to set up `pytextprep` for local development.
+Ready to contribute? Here's how to set up this project for local development.
 
 
 
