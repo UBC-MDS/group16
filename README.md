@@ -1,6 +1,4 @@
 # group16
-DSCI 532 
-
 
 
 ### Contributing
