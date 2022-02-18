@@ -2,15 +2,17 @@
 
 ## Description of the dashboard
 
-The dashboard represents Vancouver crime statistics over the past 5 years. It includes three different graphs and three different input widgets. 
+The Vancouver crime statistics dashboard displays criminal incidents that occurred over the past 5 years under the Vancouver Police Department jurisdiction.
 
-The first graph depicts the bar chart of the counts of different crime types, and the user can specify the neighborhood, year, and time of the day to get different bars. The colors correspond to various kinds of crimes. 
+On the left, there is a panel that enables filtering the data by neighbourhood and defining a year range.
 
-The second graph shows a map of Vancouver with its corresponding number of crimes as circles. The user can specify the year and time of the day for this interactive map. As the number of crimes increases, the size of the circles also increases. The map shows the number of crimes as a tooltip when users hover over different neighborhoods.
+Right above the filtering panel, on the top-left corner, there is a summary statistic that shows the total number of crimes for the user-selected neighbourhood and time range.
 
-The final graph is a time series of crimes. By default, it illustrates the crimes that happened during the day or night over the past 5 years. However, the user can select the time of the day (day or night) from the left panel and update the plot. In addition, the user can specify the years from the left panel and only show the time series of the respective years. Moreover, the user can choose the neighborhood from the left panel and update the time series.
+A bar chart depicts the count of crimes by type, based on the global criteria mentioned above, enabling analysis of most frequent crimes by neighbourhood.
 
-The dashboard also shows the total number of crimes for the user-selected years on the top-left corner.
+The map of Vancouver is presented in the right upper corner, with its corresponding number of crimes by neighbourhood as circles. As the number of crimes increases, the size of the circles also increases. Additionally, the map shows the number of crimes as a tooltip when the user hovers over different areas of the city.
+
+The final graph is a time series that illustrates the crimes that happened during the selected time range in the specified neighbourhoods. Moreover, the user can turn on a specific toggle from the filtering panel to segregate the crimes by the time of the day when the incident occurred (day or night) and inspect trends. 
 
 
 ### Contributing
