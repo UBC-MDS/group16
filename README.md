@@ -14,6 +14,8 @@ The map of Vancouver is presented in the right upper corner, with its correspond
 
 The final graph is a time series that illustrates the crimes that happened during the selected time range in the specified neighbourhoods. Moreover, the user can turn on a specific toggle from the filtering panel to segregate the crimes by the time of the day when the incident occurred (day or night) and inspect trends. 
 
+![](dashboard_sketch.png)
+
 
 ### Contributing
 
