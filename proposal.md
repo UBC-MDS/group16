@@ -1,11 +1,6 @@
 Crime in Vancouver Dashboard Proposal
 ================
 
--   [Motivation and Purpose](#Motivation and Purpose)
--   [Description of the data](#Description of the data)
--   [Research questions and usage scenarios](#Research questions and usage scenarios)
--   [Description of the app and the sketch](#Description of the app and the sketch)
-
 ## Motivation and Purpose
 Our role: Data science team in the Vancouver Police Department
 Target audience: Newcomers to Vancouver looking for places to live
