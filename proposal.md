@@ -13,8 +13,3 @@ The dataset includes 32,012 reported crime cases in Vancouver from January 2017 
 
 ## Research questions and usage scenarios
 Melisa is deciding whether she should move to Vancouver with her family. As someone new to Vancouver, she doesn't know which neighborhood to live in if she decides to move. First, she looks at the trends of total number of crimes in Vancouver and she can filter this data by daytime or nighttime and she realizes that even though Vancouver's total number of crimes have gone up in the past five years, it is still lower than where she lives now, so she proceeds with [exploring] different neighborhoods. She finds certain neighborhoods have become safer in the past five years in terms of the total number of crimes using the filter for years. She then [drills down] to look at the types of crimes in the safer neighborhoods using the neighborhoods filter in the dashboard and [identify] neighborhoods that only have petty crimes or misdemeanors which shouldn't pose danger to her and her family. She makes a list of the neighborhoods she deems worth visiting and starts looking at houses in those neighborhoods after using our dashboard.
-
-## Description of the app and the sketch
-insert paragraph
-
-![Example Sketch](src/dashboard_sketch.png)
