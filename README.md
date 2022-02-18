@@ -1,4 +1,4 @@
-# group16
+# Vancouver Crime Dashboard
 
 ## Description of the dashboard
 
