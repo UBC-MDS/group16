@@ -1,4 +1,4 @@
-# group16
+# Vancouver Crime Dashboard
 
 ## Description of the dashboard
 
@@ -13,6 +13,8 @@ A bar chart depicts the count of crimes by type, based on the global criteria me
 The map of Vancouver is presented in the right upper corner, with its corresponding number of crimes by neighbourhood as circles. As the number of crimes increases, the size of the circles also increases. Additionally, the map shows the number of crimes as a tooltip when the user hovers over different areas of the city.
 
 The final graph is a time series that illustrates the crimes that happened during the selected time range in the specified neighbourhoods. Moreover, the user can turn on a specific toggle from the filtering panel to segregate the crimes by the time of the day when the incident occurred (day or night) and inspect trends. 
+
+![](dashboard_sketch.png)
 
 
 ### Contributing
