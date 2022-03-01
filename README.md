@@ -20,7 +20,7 @@ The final graph is a time series that illustrates the crimes that happened durin
 
 You can download this file, create a conda environment and activate it as follows.
 ```
-conda env create -f environment.yml
+conda env create -f environment.yaml
 conda activate van-crime
 ```
 
