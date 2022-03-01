@@ -16,6 +16,13 @@ The final graph is a time series that illustrates the crimes that happened durin
 
 ![Example Sketch](src/dashboard_sketch.png)
 
+### Installation
+
+You can download this file, create a conda environment and activate it as follows.
+```
+conda env create -f environment.yml
+conda activate van-crime
+```
 
 ### Contributing
 
