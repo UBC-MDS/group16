@@ -5,6 +5,7 @@ import numpy as np
 import altair as alt
 import utm
 import geopandas as gpd
+import dash_daq as daq
 
 alt.data_transformers.disable_max_rows()
 
@@ -181,6 +182,11 @@ plot_body = [
 ]
 
 
+app = Dash("Vancouver Crime Dashboard")
+
+# Load data
+van_crime = pd.read_csv("data/processed_merged_df.csv")
+
 """Options"""
 # Options for neighbourhood
 opt_dropdown_neighbourhood = [
@@ -189,7 +195,9 @@ opt_dropdown_neighbourhood = [
 ]
 
 # Options for year
-opt_slider_year = [{"label": year, "value": year} for year in np.unique(data["YEAR"])]
+opt_slider_year = [
+    {"label": year, "value": year} for year in np.unique(van_crime["YEAR"])
+]
 
 opt_dropdown_time = [
     {"label": "Day", "value": "Time"},
