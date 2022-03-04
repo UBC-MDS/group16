@@ -4,10 +4,12 @@ import pandas as pd
 import numpy as np
 import altair as alt
 import geopandas as gpd
-from prep_data import prep_data
+import utm
+
 import sys
 
 sys.path.append("/app/")
+# from .prep_data import prep_data
 
 alt.data_transformers.disable_max_rows()
 
@@ -185,6 +187,20 @@ app.layout = html.Div(id="main", className="app", children=page_layout)
 
 
 """Functions"""
+
+
+def prep_data(df):
+    # eliminate data sets without coordenates
+    df = df[df["HUNDRED_BLOCK"] != "OFFSET TO PROTECT PRIVACY"]
+    df.reset_index(drop=True, inplace=True)
+    # rename columns
+    df = df.rename(columns={"NEIGHBOURHOOD": "Neighborhood", "TYPE": "Type"})
+    # convert coordenates
+    pp_df = df.copy()
+    pp_df.loc[:, "lat"], pp_df.loc[:, "lon"] = utm.to_latlon(
+        pp_df["X"], pp_df["Y"], 10, "n", strict=False
+    )
+    return pp_df
 
 
 def load_nb():
