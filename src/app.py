@@ -1,4 +1,3 @@
-from turtle import width
 from dash import Dash, html, Input, Output, dcc
 import dash_bootstrap_components as dbc
 import pandas as pd
