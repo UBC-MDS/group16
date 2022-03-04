@@ -1,3 +1,4 @@
+from tkinter.ttk import Style
 from dash import Dash, html, Input, Output, dcc
 import dash_bootstrap_components as dbc
 import pandas as pd
@@ -34,6 +35,14 @@ opt_dropdown_time = [
     {"label": "Day and Night", "value": "Day and Night"},
 ]
 
+opt_radio_year = [
+    {"label": "2017", "value": 2017},
+    {"label": "2018", "value": 2018},
+    {"label": "2019", "value": 2019},
+    {"label": "2020", "value": 2020},
+    {"label": "2021", "value": 2021},
+]
+
 """Card"""
 # Cards
 card1 = dbc.Card(
@@ -64,19 +73,12 @@ card2 = dbc.Card(
         html.Br(),
         ### Slider for year
         html.H5("Year", className="text-dark"),
-        dcc.Slider(
-            2017,
-            2021,
-            1,
+        dcc.RadioItems(
+            id="year_radio",
             value=2021,
-            id="year_slider",
-            marks={
-                2017: "2017",
-                2018: "2018",
-                2019: "2019",
-                2020: "2020",
-                2021: "2021",
-            },
+            options=opt_radio_year,
+            className="radiobutton",
+            labelStyle={"display": "in-block", "marginLeft": 20},
         ),
         html.Br(),
         html.Br(),
@@ -201,7 +203,7 @@ def load_gdf():
 
 @app.callback(
     Output("map_plot", "srcDoc"),
-    Input("year_slider", "value"),
+    Input("year_radio", "value"),
 )
 def plot_map_all(year):
     # load Van crime data
@@ -331,7 +333,7 @@ def lineplot(time, neighbourhood):
 @app.callback(
     Output("bar_plot", "srcDoc"),
     Input("neighbourhood_input", "value"),
-    Input("year_slider", "value"),
+    Input("year_radio", "value"),
 )
 def barchart(neighbourhood, year):
     data = pd.read_csv("data/processed/merged_df.csv", index_col=0)
@@ -369,7 +371,7 @@ def barchart(neighbourhood, year):
 @app.callback(
     Output("summary", "children"),
     Input("neighbourhood_input", "value"),
-    Input("year_slider", "value"),
+    Input("year_radio", "value"),
 )
 def summary(neighbourhood, year):
     data = pd.read_csv("data/processed/merged_df.csv", index_col=0)
