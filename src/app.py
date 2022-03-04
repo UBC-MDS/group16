@@ -351,9 +351,9 @@ def barchart(neighbourhood, year):
     Input("year_radio", "value"),
 )
 def summary(neighbourhood, year):
-    data = pd.read_csv("data/processed/merged_df.csv", index_col=0)
+    data = pd.read_csv("data/processed/processed_df.csv", index_col=0)
     data = data[data["YEAR"] == year]
-    data = data[data["NEIGHBOURHOOD"] == neighbourhood]
+    data = data[data["Neighborhood"] == neighbourhood]
     return len(data)
 
 
