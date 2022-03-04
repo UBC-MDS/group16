@@ -4,13 +4,15 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 import numpy as np
 import altair as alt
-import utm
 import geopandas as gpd
 from prep_data import prep_data
+import sys
+
+sys.path.append("/app/")
 
 alt.data_transformers.disable_max_rows()
 
-# read the data
+# Read the data
 data = pd.read_csv("data/processed/processed_df.csv", index_col=0)
 
 
@@ -29,12 +31,14 @@ opt_dropdown_neighbourhood = [
     for neighbourhood in data["Neighborhood"].dropna().unique()
 ]
 
+# Options for time
 opt_dropdown_time = [
     {"label": "Day", "value": "Day"},
     {"label": "Night", "value": "Night"},
     {"label": "Day and Night", "value": "Day and Night"},
 ]
 
+# Options for year
 opt_radio_year = [
     {"label": "2017", "value": 2017},
     {"label": "2018", "value": 2018},
@@ -43,8 +47,8 @@ opt_radio_year = [
     {"label": "2021", "value": 2021},
 ]
 
-"""Card"""
-# Cards
+"""Cards"""
+# Summary card
 card1 = dbc.Card(
     [
         html.H4(
@@ -59,6 +63,7 @@ card1 = dbc.Card(
     color="light",
 )
 
+# Filters card
 card2 = dbc.Card(
     [
         html.H5("Neighbourhood", className="text-dark"),
@@ -96,13 +101,12 @@ card2 = dbc.Card(
     color="light",
 )
 
-""" Layouts """
+"""Layouts"""
+# Filter layout
 filter_panel = [
-    ### Top Header Text
     html.H2("Vancouver Crime Dashboard", style={"marginLeft": 20}),
     html.Br(),
     html.Br(),
-    ### Cards
     card1,
     html.Br(),
     html.Br(),
@@ -111,7 +115,7 @@ filter_panel = [
     html.Br(),
 ]
 
-
+# Plots layout
 plot_body = [
     dbc.Row(
         [
@@ -163,7 +167,7 @@ plot_body = [
     ),
 ]
 
-# Define page layout
+# Page layout
 page_layout = html.Div(
     className="page_layout",
     children=[
@@ -181,7 +185,9 @@ page_layout = html.Div(
 app.layout = html.Div(id="main", className="app", children=page_layout)
 
 
-# Functions
+"""Functions"""
+
+
 def load_nb():
     nb = pd.read_csv(r"data/van_neighbourhoods.csv", sep=";")
     nb["geo_point_2d"] = nb["geo_point_2d"].apply(
@@ -255,8 +261,8 @@ def plot_map_all(year):
     Input("neighbourhood_input", "value"),
 )
 def lineplot(time, neighbourhood):
-    data = pd.read_csv("data/processed/merged_df.csv", index_col=0)
-    data = data[data["NEIGHBOURHOOD"] == neighbourhood]
+    data = pd.read_csv("data/processed/processed_df.csv", index_col=0)
+    data = data[data["Neighborhood"] == neighbourhood]
 
     if time == "Day and Night":
         lineplot = (
@@ -329,25 +335,25 @@ def lineplot(time, neighbourhood):
     Input("year_radio", "value"),
 )
 def barchart(neighbourhood, year):
-    data = pd.read_csv("data/processed/merged_df.csv", index_col=0)
+    data = pd.read_csv("data/processed/processed_df.csv", index_col=0)
     data = data[data["YEAR"] == year]
-    data = data[data["NEIGHBOURHOOD"] == neighbourhood]
+    data = data[data["Neighborhood"] == neighbourhood]
     data = pd.DataFrame(
-        data=data[["YEAR", "TYPE"]].value_counts(), columns=["COUNTS"]
-    ).reset_index(level=["YEAR", "TYPE"])
+        data=data[["YEAR", "Type"]].value_counts(), columns=["COUNTS"]
+    ).reset_index(level=["YEAR", "Type"])
 
     barchart = (
         alt.Chart(data, title="Crimes by Type")
         .mark_bar()
         .encode(
             x=alt.X(
-                "TYPE", sort="-y", axis=alt.Axis(labels=False), title="Type of Crime"
+                "Type", sort="-y", axis=alt.Axis(labels=False), title="Type of Crime"
             ),
             y=alt.Y("COUNTS", title="Number of Crimes"),
             color=alt.Color(
-                "TYPE", scale=alt.Scale(scheme="yelloworangered"), title="Type"
+                "Type", scale=alt.Scale(scheme="yelloworangered"), title="Type"
             ),
-            tooltip=alt.Tooltip("TYPE"),
+            tooltip=alt.Tooltip("Type"),
         )
         .transform_window(
             rank="rank(COUNTS)", sort=[alt.SortField("COUNTS", order="descending")]
