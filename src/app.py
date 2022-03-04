@@ -6,10 +6,9 @@ import altair as alt
 import geopandas as gpd
 import utm
 
-import sys
+# import sys
 
-sys.path.append("/app/")
-# from .prep_data import prep_data
+# sys.path.append("/app/")
 
 alt.data_transformers.disable_max_rows()
 
