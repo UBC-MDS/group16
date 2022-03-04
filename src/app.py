@@ -1,3 +1,4 @@
+from tkinter.ttk import Style
 from dash import Dash, html, Input, Output, dcc
 import dash_bootstrap_components as dbc
 import pandas as pd
@@ -5,6 +6,7 @@ import numpy as np
 import altair as alt
 import utm
 import geopandas as gpd
+from prep_data import prep_data
 
 alt.data_transformers.disable_max_rows()
 
@@ -20,89 +22,6 @@ app = Dash(
 
 server = app.server
 
-
-# def prep_data(df):
-#     # eliminate data sets without coordenates
-#     df = df[df["HUNDRED_BLOCK"] != "OFFSET TO PROTECT PRIVACY"]
-#     df.reset_index(drop=True, inplace=True)
-#     # rename columns
-#     df = df.rename(columns={"NEIGHBOURHOOD": "Neighborhood", "TYPE": "Type"})
-#     # convert coordenates
-#     pp_df = df.copy()
-#     pp_df.loc[:, "lat"], pp_df.loc[:, "lon"] = utm.to_latlon(
-#         pp_df["X"], pp_df["Y"], 10, "n", strict=False
-#     )
-#     return pp_df
-
-
-# def load_nb():
-#     nb = pd.read_csv(r"../data/van_neighbourhoods.csv", sep=";")
-#     nb["geo_point_2d"] = nb["geo_point_2d"].apply(
-#         lambda x: np.fromstring(x, dtype=np.double, sep=",")
-#     )
-#     nb[["nb_lat", "nb_lon"]] = pd.DataFrame(
-#         nb["geo_point_2d"].to_list(), columns=["nb_lat", "nb_lon"]
-#     )
-#     nb = nb.rename(columns={"Name": "Neighborhood"})
-#     nb.loc[nb.Neighborhood == "Arbutus-Ridge", "Neighborhood"] = "Arbutus Ridge"
-#     nb.loc[nb.Neighborhood == "Downtown", "Neighborhood"] = "Central Business District"
-#     return nb[["Neighborhood", "nb_lat", "nb_lon"]]
-
-
-# def load_gdf():
-#     gdf = gpd.read_file("../data/van_spatial_data")
-#     return gdf
-
-
-# def prep_map_data(df, nbs=[], yrs=[]):
-#     # filters dataset by neighbourhood/ years and add geo coordenates
-#     # load coordenates of Van neighborhoods
-#     van_nb = load_nb()
-#     if nbs:
-#         df = df[df.Neighborhood.isin(nbs)]
-#     if yrs:
-#         df = df[df.YEAR.isin(yrs)]
-#     # group by Neighborhood (default = all neighborhoods)
-#     df_filtered = df.groupby("Neighborhood").size().reset_index(name="Crimes")
-#     # add centre geo coordenates for each neighbourhood
-#     df_filtered = pd.merge(df_filtered, van_nb, on="Neighborhood")
-#     return df_filtered
-
-
-# def plot_map(df, nbs=[], yrs=[]):
-#     # load Van map
-#     gdf = load_gdf()
-
-#     # load coordenates of Van neighborhoods
-#     van_nb = load_nb()
-
-#     # filters dataset by neighbourhood/ years and add geo coordenates
-#     if nbs:
-#         df = df[df.Neighborhood.isin(nbs)]
-#     if yrs:
-#         df = df[df.YEAR.isin(yrs)]
-#     # group by Neighborhood (default = all neighborhoods)
-#     df_filtered = df.groupby("Neighborhood").size().reset_index(name="Crimes")
-#     # add centre geo coordenates for each neighbourhood
-#     df_filtered = pd.merge(df_filtered, van_nb, on="Neighborhood")
-
-#     base = alt.Chart(gdf).mark_geoshape(stroke="gray", fill=None)
-
-#     pts = (
-#         alt.Chart(df_filtered)
-#         .mark_circle()
-#         .encode(
-#             latitude="nb_lat",
-#             longitude="nb_lon",
-#             size="Crimes",
-#             color=alt.Color("Crimes", scale=alt.Scale(scheme="yelloworangered")),
-#             tooltip=["Neighborhood", "Crimes"],
-#         )
-#     )
-
-#     return (base + pts).to_html()
-
-
 """Options"""
 # Options for neighbourhood
 opt_dropdown_neighbourhood = [
@@ -114,6 +33,14 @@ opt_dropdown_time = [
     {"label": "Day", "value": "Day"},
     {"label": "Night", "value": "Night"},
     {"label": "Day and Night", "value": "Day and Night"},
+]
+
+opt_radio_year = [
+    {"label": "2017", "value": 2017},
+    {"label": "2018", "value": 2018},
+    {"label": "2019", "value": 2019},
+    {"label": "2020", "value": 2020},
+    {"label": "2021", "value": 2021},
 ]
 
 """Card"""
@@ -146,19 +73,12 @@ card2 = dbc.Card(
         html.Br(),
         ### Slider for year
         html.H5("Year", className="text-dark"),
-        dcc.Slider(
-            2017,
-            2021,
-            1,
+        dcc.RadioItems(
+            id="year_radio",
             value=2021,
-            id="year_slider",
-            marks={
-                2017: "2017",
-                2018: "2018",
-                2019: "2019",
-                2020: "2020",
-                2021: "2021",
-            },
+            options=opt_radio_year,
+            className="radiobutton",
+            labelStyle={"display": "in-block", "marginLeft": 20},
         ),
         html.Br(),
         html.Br(),
@@ -208,18 +128,19 @@ plot_body = [
                     )
                 ],
             ),
-            # dbc.Col(
-            #     [
-            #         html.Iframe(
-            #             srcDoc=map.to_html(),
-            #             style={
-            #                 "border-width": "0",
-            #                 "width": "100%",
-            #                 "height": "400px",
-            #             },
-            #         )
-            #     ],
-            # ),
+            dbc.Col(
+                [
+                    html.Iframe(
+                        id="map_plot",
+                        className="map_plot",
+                        style={
+                            "border-width": "0",
+                            "width": "100%",
+                            "height": "400px",
+                        },
+                    )
+                ],
+            ),
         ],
     ),
     html.Br(),
@@ -261,6 +182,73 @@ app.layout = html.Div(id="main", className="app", children=page_layout)
 
 
 # Functions
+def load_nb():
+    nb = pd.read_csv(r"data/van_neighbourhoods.csv", sep=";")
+    nb["geo_point_2d"] = nb["geo_point_2d"].apply(
+        lambda x: np.fromstring(x, dtype=np.double, sep=",")
+    )
+    nb[["nb_lat", "nb_lon"]] = pd.DataFrame(
+        nb["geo_point_2d"].to_list(), columns=["nb_lat", "nb_lon"]
+    )
+    nb = nb.rename(columns={"Name": "Neighborhood"})
+    nb.loc[nb.Neighborhood == "Arbutus-Ridge", "Neighborhood"] = "Arbutus Ridge"
+    nb.loc[nb.Neighborhood == "Downtown", "Neighborhood"] = "Central Business District"
+    return nb[["Neighborhood", "nb_lat", "nb_lon"]]
+
+
+def load_gdf():
+    gdf = gpd.read_file("data/van_spatial_data")
+    return gdf
+
+
+@app.callback(
+    Output("map_plot", "srcDoc"),
+    Input("year_radio", "value"),
+)
+def plot_map_all(year):
+    # load Van crime data
+    filename = "data/processed/merged_df.csv"
+    df = pd.read_csv(filename, index_col=0)
+    df = prep_data(df)
+
+    # load Van map
+    gdf = load_gdf()
+
+    # load coordenates of Van neighborhoods
+    van_nb = load_nb()
+
+    # filter by year
+    df = df[df.YEAR == year]
+    # group by Neighborhood
+    df_filtered = df.groupby("Neighborhood").size().reset_index(name="Crimes")
+    # add centre geo coordenates for each neighbourhood
+    df_filtered = pd.merge(df_filtered, van_nb, on="Neighborhood")
+
+    base = alt.Chart(gdf).mark_geoshape(stroke="gray", fill=None)
+
+    pts = (
+        alt.Chart(df_filtered, title="Number of Crimes per Neighbourhood")
+        .mark_circle()
+        .encode(
+            latitude="nb_lat",
+            longitude="nb_lon",
+            size="Crimes",
+            color=alt.Color("Crimes", scale=alt.Scale(scheme="yelloworangered")),
+            tooltip=["Neighborhood", "Crimes"],
+        )
+    )
+
+    return (
+        (base + pts)
+        .configure_title(fontSize=20)
+        .configure_legend(
+            titleFontSize=16,
+            labelFontSize=14,
+        )
+        .to_html()
+    )
+
+
 @app.callback(
     Output("line_plot", "srcDoc"),
     Input("time_input", "value"),
@@ -284,12 +272,7 @@ def lineplot(time, neighbourhood):
             .configure_axis(labelFontSize=14, titleFontSize=16)
             .configure_legend(
                 titleFontSize=16,
-                orient="top-right",
-                fillColor="#EEEEEE",
-                strokeColor="gray",
-                cornerRadius=10,
-                padding=10,
-                labelFontSize=16,
+                labelFontSize=14,
             )
             .configure_title(fontSize=20)
             .properties(width=1000, height=300)
@@ -310,12 +293,7 @@ def lineplot(time, neighbourhood):
             .configure_axis(labelFontSize=14, titleFontSize=16)
             .configure_legend(
                 titleFontSize=16,
-                orient="top-right",
-                fillColor="#EEEEEE",
-                strokeColor="gray",
-                cornerRadius=10,
-                padding=10,
-                labelFontSize=16,
+                labelFontSize=14,
             )
             .configure_title(fontSize=20)
             .properties(width=1000, height=300)
@@ -336,12 +314,7 @@ def lineplot(time, neighbourhood):
             .configure_axis(labelFontSize=14, titleFontSize=16)
             .configure_legend(
                 titleFontSize=16,
-                orient="top-right",
-                fillColor="#EEEEEE",
-                strokeColor="gray",
-                cornerRadius=10,
-                padding=10,
-                labelFontSize=16,
+                labelFontSize=14,
             )
             .configure_title(fontSize=20)
             .properties(width=1000, height=300)
@@ -353,7 +326,7 @@ def lineplot(time, neighbourhood):
 @app.callback(
     Output("bar_plot", "srcDoc"),
     Input("neighbourhood_input", "value"),
-    Input("year_slider", "value"),
+    Input("year_radio", "value"),
 )
 def barchart(neighbourhood, year):
     data = pd.read_csv("data/processed/merged_df.csv", index_col=0)
@@ -381,7 +354,10 @@ def barchart(neighbourhood, year):
         )
         .transform_filter((alt.datum.rank < 15))
         .configure_axis(labelFontSize=14, titleFontSize=16)
-        .configure_legend(titleFontSize=14)
+        .configure_legend(
+            titleFontSize=16,
+            labelFontSize=14,
+        )
         .configure_title(fontSize=20)
         .properties(width=300, height=300)
     )
@@ -391,7 +367,7 @@ def barchart(neighbourhood, year):
 @app.callback(
     Output("summary", "children"),
     Input("neighbourhood_input", "value"),
-    Input("year_slider", "value"),
+    Input("year_radio", "value"),
 )
 def summary(neighbourhood, year):
     data = pd.read_csv("data/processed/merged_df.csv", index_col=0)
