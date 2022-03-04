@@ -1,3 +1,4 @@
+from turtle import width
 from dash import Dash, html, Input, Output, dcc
 import dash_bootstrap_components as dbc
 import pandas as pd
@@ -9,7 +10,7 @@ import geopandas as gpd
 alt.data_transformers.disable_max_rows()
 
 # read the data
-data = pd.read_csv("data/processed/merged_df.csv", index_col=0)
+data = pd.read_csv("data/processed/processed_df.csv", index_col=0)
 
 
 app = Dash(
@@ -107,7 +108,7 @@ server = app.server
 # Options for neighbourhood
 opt_dropdown_neighbourhood = [
     {"label": neighbourhood, "value": neighbourhood}
-    for neighbourhood in data["NEIGHBOURHOOD"].dropna().unique()
+    for neighbourhood in data["Neighborhood"].dropna().unique()
 ]
 
 opt_dropdown_time = [
@@ -221,7 +222,7 @@ page_layout = html.Div(
     children=[
         dbc.Row(
             [
-                dbc.Col(filter_panel, className="panel"),
+                dbc.Col(filter_panel, className="panel", width=4),
                 dbc.Col(plot_body, className="body"),
             ]
         )
