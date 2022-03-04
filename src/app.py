@@ -1,3 +1,4 @@
+from turtle import width
 from dash import Dash, html, Input, Output, dcc
 import dash_bootstrap_components as dbc
 import pandas as pd
@@ -9,7 +10,7 @@ import geopandas as gpd
 alt.data_transformers.disable_max_rows()
 
 # read the data
-data = pd.read_csv("data/processed/merged_df.csv", index_col=0)
+data = pd.read_csv("data/processed/processed_df.csv", index_col=0)
 
 
 app = Dash(
@@ -107,22 +108,23 @@ server = app.server
 # Options for neighbourhood
 opt_dropdown_neighbourhood = [
     {"label": neighbourhood, "value": neighbourhood}
-    for neighbourhood in data["NEIGHBOURHOOD"].dropna().unique()
+    for neighbourhood in data["Neighborhood"].dropna().unique()
 ]
 
 opt_dropdown_time = [
-    {"label": "Day", "value": "Time"},
-    {"label": "Night", "value": "Time"},
-    {"label": "Day and Night", "value": "Time"},
+    {"label": "Day", "value": "Day"},
+    {"label": "Night", "value": "Night"},
+    {"label": "Day and Night", "value": "Day and Night"},
 ]
 
 """Card"""
 # Card
 card = dbc.Card(
     [
-        html.H2("", className="card-title"),  # need to fill in the data
-        html.P("Total Number of Crimes", className="card-text"),
+        html.H4("Total Number of Crimes", className="card-title"),
+        html.Div(id="summary", style={"color": "red", "fontSize": 20}),
     ],
+    style={"width": "18rem"},
     body=True,
     color="light",
 )
@@ -135,7 +137,10 @@ filter_panel = [
     html.Br(),
     ### Card
     card,
+    html.Br(),
+    html.Br(),
     html.H3("Filters", className="text-primary"),
+    html.Br(),
     html.H5("Neighbourhood", className="text-dark"),
     dcc.Dropdown(
         id="neighbourhood_input",
@@ -143,6 +148,7 @@ filter_panel = [
         options=opt_dropdown_neighbourhood,
         className="dropdown",
     ),
+    html.Br(),
     html.Br(),
     ### Slider for year
     html.H5("Year", className="text-dark"),
@@ -155,10 +161,11 @@ filter_panel = [
         marks={2017: "2017", 2018: "2018", 2019: "2019", 2020: "2020", 2021: "2021"},
     ),
     html.Br(),
+    html.Br(),
     html.H5("Time", className="text-dark"),
     dcc.Dropdown(
         id="time_input",
-        value="Day and night",
+        value="Day and Night",
         options=opt_dropdown_time,
         className="dropdown",
     ),
@@ -219,8 +226,12 @@ plot_body = [
 page_layout = html.Div(
     className="page_layout",
     children=[
-        dbc.Col(filter_panel, className="panel"),
-        dbc.Col(plot_body, className="body"),
+        dbc.Row(
+            [
+                dbc.Col(filter_panel, className="panel", width=4),
+                dbc.Col(plot_body, className="body"),
+            ]
+        )
     ],
 )
 
@@ -236,24 +247,53 @@ app.layout = html.Div(id="main", className="app", children=page_layout)
 )
 def lineplot(time, neighbourhood):
     data = pd.read_csv("data/processed/merged_df.csv", index_col=0)
-    daytime = range(6, 19)
-    data["TIME"] = np.where(data.HOUR.isin(daytime), "day", "night")
     data = data[data["NEIGHBOURHOOD"] == neighbourhood]
 
     if time == "Day and Night":
         lineplot = (
-            alt.Chart(data)
+            alt.Chart(data, title="Crimes over Time")
             .mark_line()
             .encode(
                 x=alt.X("YEAR:O", title="Year"),
-                y=alt.Y("count(HOUR)", scale=alt.Scale(domain=[13000, 28000])),
+                y=alt.Y("count(HOUR)", title="Number of Crimes"),
                 color=alt.Color(
                     "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
                 ),
             )
-            .properties(width=500, height=200)
+            .properties(width=700, height=200)
         )
-        return lineplot.to_html()
+
+    elif time == "Day":
+        data = data[data["TIME"] == "day"]
+        lineplot = (
+            alt.Chart(data, title="Crimes over Time")
+            .mark_line()
+            .encode(
+                x=alt.X("YEAR:O", title="Year"),
+                y=alt.Y("count(HOUR)", title="Number of Crimes"),
+                color=alt.Color(
+                    "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
+                ),
+            )
+            .properties(width=700, height=200)
+        )
+
+    else:
+        data = data[data["TIME"] == "night"]
+        lineplot = (
+            alt.Chart(data, title="Crimes over Time")
+            .mark_line()
+            .encode(
+                x=alt.X("YEAR:O", title="Year"),
+                y=alt.Y("count(HOUR)", title="Number of Crimes"),
+                color=alt.Color(
+                    "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
+                ),
+            )
+            .properties(width=700, height=200)
+        )
+
+    return lineplot.to_html()
 
 
 @app.callback(
@@ -270,11 +310,13 @@ def barchart(neighbourhood, year):
     ).reset_index(level=["YEAR", "TYPE"])
 
     barchart = (
-        alt.Chart(data)
+        alt.Chart(data, title="Crimes by Type")
         .mark_bar()
         .encode(
-            x=alt.X("TYPE", sort="-y", axis=alt.Axis(labels=False)),
-            y=alt.Y("COUNTS"),
+            x=alt.X(
+                "TYPE", sort="-y", axis=alt.Axis(labels=False), title="Type of Crime"
+            ),
+            y=alt.Y("COUNTS", title="Number of Crimes"),
             color=alt.Color(
                 "TYPE", scale=alt.Scale(scheme="yelloworangered"), title="Type"
             ),
@@ -286,6 +328,18 @@ def barchart(neighbourhood, year):
         .properties(width=200, height=200)
     )
     return barchart.to_html()
+
+
+@app.callback(
+    Output("summary", "children"),
+    Input("neighbourhood_input", "value"),
+    Input("year_slider", "value"),
+)
+def summary(neighbourhood, year):
+    data = pd.read_csv("data/processed/merged_df.csv", index_col=0)
+    data = data[data["YEAR"] == year]
+    data = data[data["NEIGHBOURHOOD"] == neighbourhood]
+    return len(data)
 
 
 if __name__ == "__main__":
