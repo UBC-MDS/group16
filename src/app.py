@@ -5,6 +5,7 @@ import numpy as np
 import altair as alt
 import utm
 import geopandas as gpd
+from prep_data import prep_data
 
 alt.data_transformers.disable_max_rows()
 
@@ -19,89 +20,6 @@ app = Dash(
 )
 
 server = app.server
-
-
-# def prep_data(df):
-#     # eliminate data sets without coordenates
-#     df = df[df["HUNDRED_BLOCK"] != "OFFSET TO PROTECT PRIVACY"]
-#     df.reset_index(drop=True, inplace=True)
-#     # rename columns
-#     df = df.rename(columns={"NEIGHBOURHOOD": "Neighborhood", "TYPE": "Type"})
-#     # convert coordenates
-#     pp_df = df.copy()
-#     pp_df.loc[:, "lat"], pp_df.loc[:, "lon"] = utm.to_latlon(
-#         pp_df["X"], pp_df["Y"], 10, "n", strict=False
-#     )
-#     return pp_df
-
-
-# def load_nb():
-#     nb = pd.read_csv(r"../data/van_neighbourhoods.csv", sep=";")
-#     nb["geo_point_2d"] = nb["geo_point_2d"].apply(
-#         lambda x: np.fromstring(x, dtype=np.double, sep=",")
-#     )
-#     nb[["nb_lat", "nb_lon"]] = pd.DataFrame(
-#         nb["geo_point_2d"].to_list(), columns=["nb_lat", "nb_lon"]
-#     )
-#     nb = nb.rename(columns={"Name": "Neighborhood"})
-#     nb.loc[nb.Neighborhood == "Arbutus-Ridge", "Neighborhood"] = "Arbutus Ridge"
-#     nb.loc[nb.Neighborhood == "Downtown", "Neighborhood"] = "Central Business District"
-#     return nb[["Neighborhood", "nb_lat", "nb_lon"]]
-
-
-# def load_gdf():
-#     gdf = gpd.read_file("../data/van_spatial_data")
-#     return gdf
-
-
-# def prep_map_data(df, nbs=[], yrs=[]):
-#     # filters dataset by neighbourhood/ years and add geo coordenates
-#     # load coordenates of Van neighborhoods
-#     van_nb = load_nb()
-#     if nbs:
-#         df = df[df.Neighborhood.isin(nbs)]
-#     if yrs:
-#         df = df[df.YEAR.isin(yrs)]
-#     # group by Neighborhood (default = all neighborhoods)
-#     df_filtered = df.groupby("Neighborhood").size().reset_index(name="Crimes")
-#     # add centre geo coordenates for each neighbourhood
-#     df_filtered = pd.merge(df_filtered, van_nb, on="Neighborhood")
-#     return df_filtered
-
-
-# def plot_map(df, nbs=[], yrs=[]):
-#     # load Van map
-#     gdf = load_gdf()
-
-#     # load coordenates of Van neighborhoods
-#     van_nb = load_nb()
-
-#     # filters dataset by neighbourhood/ years and add geo coordenates
-#     if nbs:
-#         df = df[df.Neighborhood.isin(nbs)]
-#     if yrs:
-#         df = df[df.YEAR.isin(yrs)]
-#     # group by Neighborhood (default = all neighborhoods)
-#     df_filtered = df.groupby("Neighborhood").size().reset_index(name="Crimes")
-#     # add centre geo coordenates for each neighbourhood
-#     df_filtered = pd.merge(df_filtered, van_nb, on="Neighborhood")
-
-#     base = alt.Chart(gdf).mark_geoshape(stroke="gray", fill=None)
-
-#     pts = (
-#         alt.Chart(df_filtered)
-#         .mark_circle()
-#         .encode(
-#             latitude="nb_lat",
-#             longitude="nb_lon",
-#             size="Crimes",
-#             color=alt.Color("Crimes", scale=alt.Scale(scheme="yelloworangered")),
-#             tooltip=["Neighborhood", "Crimes"],
-#         )
-#     )
-
-#     return (base + pts).to_html()
-
 
 """Options"""
 # Options for neighbourhood
@@ -208,18 +126,19 @@ plot_body = [
                     )
                 ],
             ),
-            # dbc.Col(
-            #     [
-            #         html.Iframe(
-            #             srcDoc=map.to_html(),
-            #             style={
-            #                 "border-width": "0",
-            #                 "width": "100%",
-            #                 "height": "400px",
-            #             },
-            #         )
-            #     ],
-            # ),
+            dbc.Col(
+                [
+                    html.Iframe(
+                        id="map_plot",
+                        className="map_plot",
+                        style={
+                            "border-width": "0",
+                            "width": "100%",
+                            "height": "400px",
+                        },
+                    )
+                ],
+            ),
         ],
     ),
     html.Br(),
@@ -261,6 +180,65 @@ app.layout = html.Div(id="main", className="app", children=page_layout)
 
 
 # Functions
+def load_nb():
+    nb = pd.read_csv(r"data/van_neighbourhoods.csv", sep=";")
+    nb["geo_point_2d"] = nb["geo_point_2d"].apply(
+        lambda x: np.fromstring(x, dtype=np.double, sep=",")
+    )
+    nb[["nb_lat", "nb_lon"]] = pd.DataFrame(
+        nb["geo_point_2d"].to_list(), columns=["nb_lat", "nb_lon"]
+    )
+    nb = nb.rename(columns={"Name": "Neighborhood"})
+    nb.loc[nb.Neighborhood == "Arbutus-Ridge", "Neighborhood"] = "Arbutus Ridge"
+    nb.loc[nb.Neighborhood == "Downtown", "Neighborhood"] = "Central Business District"
+    return nb[["Neighborhood", "nb_lat", "nb_lon"]]
+
+
+def load_gdf():
+    gdf = gpd.read_file("data/van_spatial_data")
+    return gdf
+
+
+@app.callback(
+    Output("map_plot", "srcDoc"),
+    Input("year_slider", "value"),
+)
+def plot_map_all(year):
+    # load Van crime data
+    filename = "data/processed/merged_df.csv"
+    df = pd.read_csv(filename, index_col=0)
+    df = prep_data(df)
+
+    # load Van map
+    gdf = load_gdf()
+
+    # load coordenates of Van neighborhoods
+    van_nb = load_nb()
+
+    # filter by year
+    df = df[df.YEAR == year]
+    # group by Neighborhood
+    df_filtered = df.groupby("Neighborhood").size().reset_index(name="Crimes")
+    # add centre geo coordenates for each neighbourhood
+    df_filtered = pd.merge(df_filtered, van_nb, on="Neighborhood")
+
+    base = alt.Chart(gdf).mark_geoshape(stroke="gray", fill=None)
+
+    pts = (
+        alt.Chart(df_filtered, title="Number of Crimes per Neighbourhood")
+        .mark_circle()
+        .encode(
+            latitude="nb_lat",
+            longitude="nb_lon",
+            size="Crimes",
+            color=alt.Color("Crimes", scale=alt.Scale(scheme="yelloworangered")),
+            tooltip=["Neighborhood", "Crimes"],
+        )
+    )
+
+    return (base + pts).configure_title(fontSize=20).to_html()
+
+
 @app.callback(
     Output("line_plot", "srcDoc"),
     Input("time_input", "value"),
