@@ -6,22 +6,17 @@ import altair as alt
 import geopandas as gpd
 import utm
 
-# import sys
-
-# sys.path.append("/app/")
-
 alt.data_transformers.disable_max_rows()
 
 # Read the data
 data = pd.read_csv("data/processed/processed_df.csv", index_col=0)
 
-
+# App server
 app = Dash(
     __name__,
     title="Vancouver Crime Dashboard",
     external_stylesheets=[dbc.themes.BOOTSTRAP],
 )
-
 server = app.server
 
 """Options"""
@@ -51,6 +46,7 @@ opt_radio_year = [
 # Summary card
 card1 = dbc.Card(
     [
+        # Summary statistics
         html.H4(
             "Total Number of Crimes", className="card-title", style={"marginLeft": 50}
         ),
@@ -66,6 +62,7 @@ card1 = dbc.Card(
 # Filters card
 card2 = dbc.Card(
     [
+        # Dropdown for neighbourhood
         html.H5("Neighbourhood", className="text-dark"),
         dcc.Dropdown(
             id="neighbourhood_input",
@@ -76,7 +73,7 @@ card2 = dbc.Card(
         html.Br(),
         html.Br(),
         html.Br(),
-        ### Slider for year
+        # Radio button for year
         html.H5("Year", className="text-dark"),
         dcc.RadioItems(
             id="year_radio",
@@ -88,6 +85,7 @@ card2 = dbc.Card(
         html.Br(),
         html.Br(),
         html.Br(),
+        # Dropdown for time
         html.H5("Time", className="text-dark"),
         dcc.Dropdown(
             id="time_input",
@@ -258,15 +256,15 @@ def plot_map_all(year):
         )
     )
 
-    return (
+    map = (
         (base + pts)
         .configure_title(fontSize=20)
         .configure_legend(
             titleFontSize=16,
             labelFontSize=14,
         )
-        .to_html()
     )
+    return map.to_html()
 
 
 @app.callback(
@@ -278,69 +276,32 @@ def lineplot(time, neighbourhood):
     data = pd.read_csv("data/processed/processed_df.csv", index_col=0)
     data = data[data["Neighborhood"] == neighbourhood]
 
-    if time == "Day and Night":
-        lineplot = (
-            alt.Chart(data, title="Crimes over Time")
-            .mark_line()
-            .encode(
-                x=alt.X("YEAR:O", title="Year"),
-                y=alt.Y("count(HOUR)", title="Number of Crimes"),
-                color=alt.Color(
-                    "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
-                ),
-            )
-            .configure_axis(labelFontSize=14, titleFontSize=16)
-            .configure_legend(
-                titleFontSize=16,
-                labelFontSize=14,
-            )
-            .configure_title(fontSize=20)
-            .properties(width=1000, height=300)
-        )
-
-    elif time == "Day":
+    if time == "Day":
         data = data[data["TIME"] == "day"]
-        lineplot = (
-            alt.Chart(data, title="Crimes over Time")
-            .mark_line()
-            .encode(
-                x=alt.X("YEAR:O", title="Year"),
-                y=alt.Y("count(HOUR)", title="Number of Crimes"),
-                color=alt.Color(
-                    "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
-                ),
-            )
-            .configure_axis(labelFontSize=14, titleFontSize=16)
-            .configure_legend(
-                titleFontSize=16,
-                labelFontSize=14,
-            )
-            .configure_title(fontSize=20)
-            .properties(width=1000, height=300)
-        )
 
-    else:
+    elif time == "Night":
         data = data[data["TIME"] == "night"]
-        lineplot = (
-            alt.Chart(data, title="Crimes over Time")
-            .mark_line()
-            .encode(
-                x=alt.X("YEAR:O", title="Year"),
-                y=alt.Y("count(HOUR)", title="Number of Crimes"),
-                color=alt.Color(
-                    "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
-                ),
-            )
-            .configure_axis(labelFontSize=14, titleFontSize=16)
-            .configure_legend(
-                titleFontSize=16,
-                labelFontSize=14,
-            )
-            .configure_title(fontSize=20)
-            .properties(width=1000, height=300)
-        )
 
-    return lineplot.to_html()
+    line_plot = (
+        alt.Chart(data, title="Crimes over Time")
+        .mark_line()
+        .encode(
+            x=alt.X("YEAR:O", title="Year"),
+            y=alt.Y("count(HOUR)", title="Number of Crimes"),
+            color=alt.Color(
+                "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
+            ),
+        )
+        .configure_axis(labelFontSize=14, titleFontSize=16)
+        .configure_legend(
+            titleFontSize=16,
+            labelFontSize=14,
+        )
+        .configure_title(fontSize=20)
+        .properties(width=1000, height=300)
+    )
+
+    return line_plot.to_html()
 
 
 @app.callback(
