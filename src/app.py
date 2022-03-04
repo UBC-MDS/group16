@@ -238,7 +238,15 @@ def plot_map_all(year):
         )
     )
 
-    return (base + pts).configure_title(fontSize=20).to_html()
+    return (
+        (base + pts)
+        .configure_title(fontSize=20)
+        .configure_legend(
+            titleFontSize=16,
+            labelFontSize=14,
+        )
+        .to_html()
+    )
 
 
 @app.callback(
@@ -264,12 +272,7 @@ def lineplot(time, neighbourhood):
             .configure_axis(labelFontSize=14, titleFontSize=16)
             .configure_legend(
                 titleFontSize=16,
-                orient="top-right",
-                fillColor="#EEEEEE",
-                strokeColor="gray",
-                cornerRadius=10,
-                padding=10,
-                labelFontSize=16,
+                labelFontSize=14,
             )
             .configure_title(fontSize=20)
             .properties(width=1000, height=300)
@@ -290,12 +293,7 @@ def lineplot(time, neighbourhood):
             .configure_axis(labelFontSize=14, titleFontSize=16)
             .configure_legend(
                 titleFontSize=16,
-                orient="top-right",
-                fillColor="#EEEEEE",
-                strokeColor="gray",
-                cornerRadius=10,
-                padding=10,
-                labelFontSize=16,
+                labelFontSize=14,
             )
             .configure_title(fontSize=20)
             .properties(width=1000, height=300)
@@ -316,12 +314,7 @@ def lineplot(time, neighbourhood):
             .configure_axis(labelFontSize=14, titleFontSize=16)
             .configure_legend(
                 titleFontSize=16,
-                orient="top-right",
-                fillColor="#EEEEEE",
-                strokeColor="gray",
-                cornerRadius=10,
-                padding=10,
-                labelFontSize=16,
+                labelFontSize=14,
             )
             .configure_title(fontSize=20)
             .properties(width=1000, height=300)
@@ -361,7 +354,10 @@ def barchart(neighbourhood, year):
         )
         .transform_filter((alt.datum.rank < 15))
         .configure_axis(labelFontSize=14, titleFontSize=16)
-        .configure_legend(titleFontSize=14)
+        .configure_legend(
+            titleFontSize=16,
+            labelFontSize=14,
+        )
         .configure_title(fontSize=20)
         .properties(width=300, height=300)
     )
