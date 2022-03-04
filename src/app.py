@@ -25,6 +25,8 @@ opt_dropdown_neighbourhood = [
     {"label": neighbourhood, "value": neighbourhood}
     for neighbourhood in data["Neighborhood"].dropna().unique()
 ]
+opt_dropdown_neighbourhood.remove(opt_dropdown_neighbourhood[-1])
+opt_dropdown_neighbourhood.remove(opt_dropdown_neighbourhood[-4])
 
 # Options for time
 opt_dropdown_time = [
