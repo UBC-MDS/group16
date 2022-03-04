@@ -111,9 +111,9 @@ opt_dropdown_neighbourhood = [
 ]
 
 opt_dropdown_time = [
-    {"label": "Day", "value": "Time"},
-    {"label": "Night", "value": "Time"},
-    {"label": "Day and Night", "value": "Time"},
+    {"label": "Day", "value": "Day"},
+    {"label": "Night", "value": "Night"},
+    {"label": "Day and Night", "value": "Day and Night"},
 ]
 
 """Card"""
@@ -158,7 +158,7 @@ filter_panel = [
     html.H5("Time", className="text-dark"),
     dcc.Dropdown(
         id="time_input",
-        value="Day and night",
+        value="Day and Night",
         options=opt_dropdown_time,
         className="dropdown",
     ),
@@ -236,11 +236,41 @@ app.layout = html.Div(id="main", className="app", children=page_layout)
 )
 def lineplot(time, neighbourhood):
     data = pd.read_csv("data/processed/merged_df.csv", index_col=0)
-    daytime = range(6, 19)
-    data["TIME"] = np.where(data.HOUR.isin(daytime), "day", "night")
     data = data[data["NEIGHBOURHOOD"] == neighbourhood]
 
     if time == "Day and Night":
+        lineplot = (
+            alt.Chart(data)
+            .mark_line()
+            .encode(
+                x=alt.X("YEAR:O", title="Year"),
+                y=alt.Y("count(HOUR)", scale=alt.Scale(domain=[13000, 28000])),
+                color=alt.Color(
+                    "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
+                ),
+            )
+            .properties(width=500, height=200)
+        )
+        return lineplot.to_html()
+
+    elif time == "Day":
+        data[data["TIME"] == "day"]
+        lineplot = (
+            alt.Chart(data)
+            .mark_line()
+            .encode(
+                x=alt.X("YEAR:O", title="Year"),
+                y=alt.Y("count(HOUR)", scale=alt.Scale(domain=[13000, 28000])),
+                color=alt.Color(
+                    "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
+                ),
+            )
+            .properties(width=500, height=200)
+        )
+        return lineplot.to_html()
+
+    else:
+        data[data["TIME"] == "night"]
         lineplot = (
             alt.Chart(data)
             .mark_line()
