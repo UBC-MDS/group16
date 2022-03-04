@@ -22,55 +22,55 @@ def load_gdf():
     return  gdf
 
 
-def prep_map_data(df, nbs=[], yrs=[]):
-    # filters dataset by neighbourhood/ years and add geo coordenates
-    # load coordenates of Van neighborhoods
-    van_nb = load_nb()
-    if nbs:
-        df = df[df.Neighborhood.isin(nbs)]
-    if yrs:
-        df = df[df.YEAR.isin(yrs)]
-    # group by Neighborhood (default = all neighborhoods)
-    df_filtered = df.groupby("Neighborhood").size().reset_index(name='Crimes')
-    # add centre geo coordenates for each neighbourhood
-    df_filtered = pd.merge(df_filtered, van_nb, on="Neighborhood")
-    return df_filtered
+#def prep_map_data(df, nbs=[], yrs=[]):
+#    # filters dataset by neighbourhood/ years and add geo coordenates
+#    # load coordenates of Van neighborhoods
+#    van_nb = load_nb()
+#    if nbs:
+#        df = df[df.Neighborhood.isin(nbs)]
+#    if yrs:
+#        df = df[df.YEAR.isin(yrs)]
+#    # group by Neighborhood (default = all neighborhoods)
+#    df_filtered = df.groupby("Neighborhood").size().reset_index(name='Crimes')
+#    # add centre geo coordenates for each neighbourhood
+#    df_filtered = pd.merge(df_filtered, van_nb, on="Neighborhood")
+#    return df_filtered
 
 
-def plot_map(df, nbs=[], yrs=[]):
-    # load Van map
-    gdf = load_gdf()
+#def plot_map(df, nbs=[], yrs=[]):
+#    # load Van map
+#    gdf = load_gdf()
+#
+#    # load coordenates of Van neighborhoods
+#    van_nb = load_nb()
+#
+#    # filters dataset by neighbourhood/ years and add geo coordenates
+#    if nbs:
+#        df = df[df.Neighborhood.isin(nbs)]
+#    if yrs:
+#        df = df[df.YEAR.isin(yrs)]
+#    # group by Neighborhood (default = all neighborhoods)
+#    df_filtered = df.groupby("Neighborhood").size().reset_index(name='Crimes')
+#    # add centre geo coordenates for each neighbourhood
+#    df_filtered = pd.merge(df_filtered, van_nb, on="Neighborhood")
+#
+#    base = alt.Chart(gdf).mark_geoshape(
+#        stroke='gray', 
+#       fill=None
+#    )
+#
+#    pts = alt.Chart(df_filtered).mark_circle().encode(
+#        latitude='nb_lat',
+#        longitude='nb_lon',
+#        size='Crimes',
+#        color=alt.Color('Crimes', scale=alt.Scale(scheme='yelloworangered')),
+#       tooltip=["Neighborhood","Crimes"]
+#   )
+#    
+#    return base + pts
 
-    # load coordenates of Van neighborhoods
-    van_nb = load_nb()
 
-    # filters dataset by neighbourhood/ years and add geo coordenates
-    if nbs:
-        df = df[df.Neighborhood.isin(nbs)]
-    if yrs:
-        df = df[df.YEAR.isin(yrs)]
-    # group by Neighborhood (default = all neighborhoods)
-    df_filtered = df.groupby("Neighborhood").size().reset_index(name='Crimes')
-    # add centre geo coordenates for each neighbourhood
-    df_filtered = pd.merge(df_filtered, van_nb, on="Neighborhood")
-
-    base = alt.Chart(gdf).mark_geoshape(
-        stroke='gray', 
-        fill=None
-    )
-
-    pts = alt.Chart(df_filtered).mark_circle().encode(
-        latitude='nb_lat',
-        longitude='nb_lon',
-        size='Crimes',
-        color=alt.Color('Crimes', scale=alt.Scale(scheme='yelloworangered')),
-        tooltip=["Neighborhood","Crimes"]
-    )
-    
-    return base + pts
-
-
-def plot_map_all():
+def plot_map_all( yrs=[]):
     # load Van crime data
     filename = "../data/processed/merged_df.csv"
     df = pd.read_csv(filename,  index_col=0)
@@ -82,6 +82,9 @@ def plot_map_all():
     # load coordenates of Van neighborhoods
     van_nb = load_nb()
 
+    #filter by year
+    if yrs:
+        df = df[df.YEAR.isin(yrs)]
     # group by Neighborhood (default = all neighborhoods)
     df_filtered = df.groupby("Neighborhood").size().reset_index(name='Crimes')
     # add centre geo coordenates for each neighbourhood
