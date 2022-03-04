@@ -314,7 +314,7 @@ def barchart(neighbourhood, year):
     data = data[data["YEAR"] == year]
     data = data[data["Neighborhood"] == neighbourhood]
     data = pd.DataFrame(
-        data=data[["YEAR", "Type"]].value_counts(), columns=["COUNTS"]
+        data=data[["YEAR", "Type"]].value_counts(), columns=["Counts"]
     ).reset_index(level=["YEAR", "Type"])
 
     barchart = (
@@ -324,11 +324,11 @@ def barchart(neighbourhood, year):
             x=alt.X(
                 "Type", sort="-y", axis=alt.Axis(labels=False), title="Type of Crime"
             ),
-            y=alt.Y("COUNTS", title="Number of Crimes"),
+            y=alt.Y("Counts", title="Number of Crimes"),
             color=alt.Color(
                 "Type", scale=alt.Scale(scheme="yelloworangered"), title="Type"
             ),
-            tooltip=alt.Tooltip("Type"),
+            tooltip=alt.Tooltip(["Type", "Counts"]),
         )
         .transform_window(
             rank="rank(COUNTS)", sort=[alt.SortField("COUNTS", order="descending")]
