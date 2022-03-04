@@ -117,13 +117,61 @@ opt_dropdown_time = [
 ]
 
 """Card"""
-# Card
-card = dbc.Card(
+# Cards
+card1 = dbc.Card(
     [
-        html.H4("Total Number of Crimes", className="card-title"),
-        html.Div(id="summary", style={"color": "red", "fontSize": 20}),
+        html.H4(
+            "Total Number of Crimes", className="card-title", style={"marginLeft": 50}
+        ),
+        html.Div(
+            id="summary", style={"color": "#E33B18", "fontSize": 25, "marginLeft": 140}
+        ),
     ],
-    style={"width": "18rem"},
+    style={"width": "25rem", "marginLeft": 20},
+    body=True,
+    color="light",
+)
+
+card2 = dbc.Card(
+    [
+        html.H5("Neighbourhood", className="text-dark"),
+        dcc.Dropdown(
+            id="neighbourhood_input",
+            value="Kitsilano",
+            options=opt_dropdown_neighbourhood,
+            className="dropdown",
+        ),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        ### Slider for year
+        html.H5("Year", className="text-dark"),
+        dcc.Slider(
+            2017,
+            2021,
+            1,
+            value=2021,
+            id="year_slider",
+            marks={
+                2017: "2017",
+                2018: "2018",
+                2019: "2019",
+                2020: "2020",
+                2021: "2021",
+            },
+        ),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.H5("Time", className="text-dark"),
+        dcc.Dropdown(
+            id="time_input",
+            value="Day and Night",
+            options=opt_dropdown_time,
+            className="dropdown",
+        ),
+    ],
+    style={"width": "25rem", "marginLeft": 20},
     body=True,
     color="light",
 )
@@ -131,43 +179,16 @@ card = dbc.Card(
 """ Layouts """
 filter_panel = [
     ### Top Header Text
-    html.H2("Vancouver Crime Dashboard"),
+    html.H2("Vancouver Crime Dashboard", style={"marginLeft": 20}),
     html.Br(),
     html.Br(),
-    ### Card
-    card,
+    ### Cards
+    card1,
     html.Br(),
     html.Br(),
-    html.H3("Filters", className="text-primary"),
+    html.H4("Filters", style={"marginLeft": 20}),
+    card2,
     html.Br(),
-    html.H5("Neighbourhood", className="text-dark"),
-    dcc.Dropdown(
-        id="neighbourhood_input",
-        value="Kitsilano",
-        options=opt_dropdown_neighbourhood,
-        className="dropdown",
-    ),
-    html.Br(),
-    html.Br(),
-    ### Slider for year
-    html.H5("Year", className="text-dark"),
-    dcc.Slider(
-        2017,
-        2021,
-        1,
-        value=2021,
-        id="year_slider",
-        marks={2017: "2017", 2018: "2018", 2019: "2019", 2020: "2020", 2021: "2021"},
-    ),
-    html.Br(),
-    html.Br(),
-    html.H5("Time", className="text-dark"),
-    dcc.Dropdown(
-        id="time_input",
-        value="Day and Night",
-        options=opt_dropdown_time,
-        className="dropdown",
-    ),
 ]
 
 
@@ -190,7 +211,7 @@ plot_body = [
             # dbc.Col(
             #     [
             #         html.Iframe(
-            #             srcDoc=final.to_html(),
+            #             srcDoc=map.to_html(),
             #             style={
             #                 "border-width": "0",
             #                 "width": "100%",
@@ -225,12 +246,13 @@ plot_body = [
 page_layout = html.Div(
     className="page_layout",
     children=[
+        dbc.Row([html.Br()]),
         dbc.Row(
             [
-                dbc.Col(filter_panel, className="panel", width=4),
+                dbc.Col(filter_panel, className="panel", width=3),
                 dbc.Col(plot_body, className="body"),
             ]
-        )
+        ),
     ],
 )
 
@@ -259,7 +281,18 @@ def lineplot(time, neighbourhood):
                     "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
                 ),
             )
-            .properties(width=700, height=200)
+            .configure_axis(labelFontSize=14, titleFontSize=16)
+            .configure_legend(
+                titleFontSize=16,
+                orient="top-right",
+                fillColor="#EEEEEE",
+                strokeColor="gray",
+                cornerRadius=10,
+                padding=10,
+                labelFontSize=16,
+            )
+            .configure_title(fontSize=20)
+            .properties(width=1000, height=300)
         )
 
     elif time == "Day":
@@ -274,7 +307,18 @@ def lineplot(time, neighbourhood):
                     "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
                 ),
             )
-            .properties(width=700, height=200)
+            .configure_axis(labelFontSize=14, titleFontSize=16)
+            .configure_legend(
+                titleFontSize=16,
+                orient="top-right",
+                fillColor="#EEEEEE",
+                strokeColor="gray",
+                cornerRadius=10,
+                padding=10,
+                labelFontSize=16,
+            )
+            .configure_title(fontSize=20)
+            .properties(width=1000, height=300)
         )
 
     else:
@@ -289,7 +333,18 @@ def lineplot(time, neighbourhood):
                     "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
                 ),
             )
-            .properties(width=700, height=200)
+            .configure_axis(labelFontSize=14, titleFontSize=16)
+            .configure_legend(
+                titleFontSize=16,
+                orient="top-right",
+                fillColor="#EEEEEE",
+                strokeColor="gray",
+                cornerRadius=10,
+                padding=10,
+                labelFontSize=16,
+            )
+            .configure_title(fontSize=20)
+            .properties(width=1000, height=300)
         )
 
     return lineplot.to_html()
@@ -319,12 +374,16 @@ def barchart(neighbourhood, year):
             color=alt.Color(
                 "TYPE", scale=alt.Scale(scheme="yelloworangered"), title="Type"
             ),
+            tooltip=alt.Tooltip("TYPE"),
         )
         .transform_window(
             rank="rank(COUNTS)", sort=[alt.SortField("COUNTS", order="descending")]
         )
         .transform_filter((alt.datum.rank < 15))
-        .properties(width=200, height=200)
+        .configure_axis(labelFontSize=14, titleFontSize=16)
+        .configure_legend(titleFontSize=14)
+        .configure_title(fontSize=20)
+        .properties(width=300, height=300)
     )
     return barchart.to_html()
 
