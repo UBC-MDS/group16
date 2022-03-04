@@ -110,9 +110,6 @@ opt_dropdown_neighbourhood = [
     for neighbourhood in data["NEIGHBOURHOOD"].dropna().unique()
 ]
 
-# Options for year
-opt_slider_year = [{"label": year, "value": year} for year in np.unique(data["YEAR"])]
-
 opt_dropdown_time = [
     {"label": "Day", "value": "Time"},
     {"label": "Night", "value": "Time"},
@@ -149,15 +146,22 @@ filter_panel = [
     html.Br(),
     ### Slider for year
     html.H5("Year", className="text-dark"),
-    dcc.Slider(2017, 2021, 1, value=2021, id="year_slider"),
+    dcc.Slider(
+        2017,
+        2021,
+        1,
+        value=2021,
+        id="year_slider",
+        marks={2017: "2017", 2018: "2018", 2019: "2019", 2020: "2020", 2021: "2021"},
+    ),
     html.Br(),
     html.H5("Time", className="text-dark"),
-    # dcc.Dropdown(
-    #     id="time_input",
-    #     value="Day and night",
-    #     options=opt_dropdown_time,
-    #     className="dropdown",
-    # ),
+    dcc.Dropdown(
+        id="time_input",
+        value="Day and night",
+        options=opt_dropdown_time,
+        className="dropdown",
+    ),
 ]
 
 
@@ -192,25 +196,23 @@ plot_body = [
         ],
     ),
     html.Br(),
-    html.Br(),
-    html.Br(),
-    # dbc.Row(
-    #     [
-    #         dbc.Col(
-    #             [
-    #                 html.Iframe(
-    #                     id="line_plot",
-    #                     className="line_plot",
-    #                     style={
-    #                         "border-width": "0",
-    #                         "width": "100%",
-    #                         "height": "400px",
-    #                     },
-    #                 )
-    #             ]
-    #         )
-    #     ]
-    # ),
+    dbc.Row(
+        [
+            dbc.Col(
+                [
+                    html.Iframe(
+                        id="line_plot",
+                        className="line_plot",
+                        style={
+                            "border-width": "0",
+                            "width": "100%",
+                            "height": "400px",
+                        },
+                    )
+                ]
+            )
+        ]
+    ),
 ]
 
 # Define page layout
@@ -227,28 +229,31 @@ app.layout = html.Div(id="main", className="app", children=page_layout)
 
 
 # Functions
-# @app.callback(
-#     Output("line_plot", "srcDoc"),
-#     Input("time_input", "value"),
-#     Input("neighbourhood_input", "value"),
-# )
-# def lineplot(time, neighbourhood):
-#     daytime = range(6, 19)
-#     data["TIME"] = np.where(data.HOUR.isin(daytime), "day", "night")
-#     data = data[data["NEIGHBOURHOOD"] == neighbourhood]
-#     lineplot = (
-#         alt.Chart(data)
-#         .mark_line()
-#         .encode(
-#             x=alt.X(time, title="Year"),
-#             y=alt.Y("count(HOUR)", scale=alt.Scale(domain=[13000, 28000])),
-#             color=alt.Color(
-#                 "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
-#             ),
-#         )
-#         .properties(width=500, height=200)
-#     )
-#     return lineplot.to_html()
+@app.callback(
+    Output("line_plot", "srcDoc"),
+    Input("time_input", "value"),
+    Input("neighbourhood_input", "value"),
+)
+def lineplot(time, neighbourhood):
+    data = pd.read_csv("data/processed/merged_df.csv", index_col=0)
+    daytime = range(6, 19)
+    data["TIME"] = np.where(data.HOUR.isin(daytime), "day", "night")
+    data = data[data["NEIGHBOURHOOD"] == neighbourhood]
+
+    if time == "Day and Night":
+        lineplot = (
+            alt.Chart(data)
+            .mark_line()
+            .encode(
+                x=alt.X("YEAR:O", title="Year"),
+                y=alt.Y("count(HOUR)", scale=alt.Scale(domain=[13000, 28000])),
+                color=alt.Color(
+                    "TIME", scale=alt.Scale(scheme="yelloworangered"), title="Time"
+                ),
+            )
+            .properties(width=500, height=200)
+        )
+        return lineplot.to_html()
 
 
 @app.callback(
