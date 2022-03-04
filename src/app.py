@@ -219,8 +219,12 @@ plot_body = [
 page_layout = html.Div(
     className="page_layout",
     children=[
-        dbc.Col(filter_panel, className="panel"),
-        dbc.Col(plot_body, className="body"),
+        dbc.Row(
+            [
+                dbc.Col(filter_panel, className="panel"),
+                dbc.Col(plot_body, className="body"),
+            ]
+        )
     ],
 )
 
@@ -251,10 +255,9 @@ def lineplot(time, neighbourhood):
             )
             .properties(width=500, height=200)
         )
-        return lineplot.to_html()
 
     elif time == "Day":
-        data[data["TIME"] == "day"]
+        data = data[data["TIME"] == "day"]
         lineplot = (
             alt.Chart(data)
             .mark_line()
@@ -267,10 +270,9 @@ def lineplot(time, neighbourhood):
             )
             .properties(width=500, height=200)
         )
-        return lineplot.to_html()
 
     else:
-        data[data["TIME"] == "night"]
+        data = data[data["TIME"] == "night"]
         lineplot = (
             alt.Chart(data)
             .mark_line()
@@ -283,7 +285,8 @@ def lineplot(time, neighbourhood):
             )
             .properties(width=500, height=200)
         )
-        return lineplot.to_html()
+
+    return lineplot.to_html()
 
 
 @app.callback(
