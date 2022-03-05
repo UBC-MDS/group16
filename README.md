@@ -5,6 +5,12 @@ Safety is an important factor for consideration when choosing a place to live. V
 
 ## Description of the dashboard
 
+
+
+https://user-images.githubusercontent.com/67261289/156861832-8fc5b7e0-b07c-4148-b8a4-2fb1e1e70389.mp4
+
+
+
 The Vancouver crime statistics dashboard displays criminal incidents that occurred over the past 5 years under the Vancouver Police Department jurisdiction.
 
 On the left, there is a panel that enables filtering the data by neighbourhood and defining a year range.
