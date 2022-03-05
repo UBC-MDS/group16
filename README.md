@@ -1,4 +1,5 @@
 # Vancouver Crime Dashboard
+Link to the dashboard: [Vancouver Crime Dashboard](https://vancouver-crime-dashboard.herokuapp.com/)
 
 ## Motivation
 Safety is an important factor for consideration when choosing a place to live. Vancouver is a major destination city for immigrants from all over the world and Canadians looking to relocate within Canada. Our dashboard visualizes crime data in Vancouver and helps newcomers decide where to move to, depending on how safe specific neighborhoods are. In addition, we provide general information, such as trends in crimes in Vancouver for the past five years and the number of crimes at different times of day, to increase newcomers' understanding of public safety and crime in Vancouver as a whole as you make your decision to relocate.
