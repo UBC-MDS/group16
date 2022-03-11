@@ -20,23 +20,16 @@ The map of Vancouver is presented in the right upper corner, with its correspond
 
 The final graph is a time series that illustrates the crimes that happened in the past five years. Moreover, the user can choose to segregate the crimes by the time of the day when the incident occurred (day, night or both) and inspect trends.
 
-### Installation
+### Run the dashboard locally
 
-You can download this file, create a conda environment and activate it as follows.
-```
-conda env create -f environment.yaml
-conda activate van-crime
-```
-You can view the source code in `src/app.py`.
+To run this app using Docker, first install Docker. Then, open Docker and clone this repository. Run the following commands in your terminal:
 
-### Run locally
-
-Make sure you are in the root directory of the repository. Then, run the following command in Terminal:
+```bash
+cd vancouver_crime_dashboard
+docker-compose up
 ```
-python src/app.py
-```
-You will be given an URL to use the dashboard.
 
+Finally, open the app in the following URL http://localhost:8000/
 
 ### Contributing
 
