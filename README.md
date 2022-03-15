@@ -16,7 +16,7 @@ Right above the filtering panel, on the top-left corner, there is a summary stat
 
 A bar chart depicts the count of crimes by type, based on the global criteria mentioned above, enabling analysis of most frequent crimes by neighbourhood.
 
-The map of Vancouver is presented in the right upper corner, with its corresponding number of crimes by neighbourhood as circles. As the number of crimes increases, the size of the circles also increases. Additionally, the map shows the number of crimes as a tooltip when the user hovers over different areas of the city.
+The map of Vancouver is presented in the right upper corner, with its corresponding number of crimes in the selected year by neighbourhood as circles. As the number of crimes increases, the size of the circles also increases. Additionally, the map shows the number of crimes as a tooltip when the user hovers over different areas of the city.
 
 The final graph is a time series that illustrates the crimes that happened in the past five years. Moreover, the user can choose to segregate the crimes by the time of the day when the incident occurred (day, night or both) and inspect trends.
 
