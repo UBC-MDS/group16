@@ -6,4 +6,4 @@ dash_bootstrap_components
 plotly
 geopandas
 numpy
-plotly.express
+utm
