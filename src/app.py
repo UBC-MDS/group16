@@ -210,7 +210,6 @@ app.layout = html.Div(id="main", className="app", children=page_layout)
     Output("map_plot", "figure"),
     Input("year_radio", "value"))
 def display_choropleth(year_radio):
-    print(year_radio)
     df = pd.read_csv(r"../data/processed/map_df.csv")#px.data.election() # replace with your own data source
     df = df[df['year']==int(year_radio)]
     geojson = gpd.read_file("../data/vancouver.geojson")#px.data.election_geojson()
