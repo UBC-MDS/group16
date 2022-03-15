@@ -68,9 +68,10 @@ card2 = dbc.Card(
         html.H5("Neighbourhood", className="text-dark"),
         dcc.Dropdown(
             id="neighbourhood_input",
-            value="Kitsilano",
+            value=["Kitsilano"],
             options=opt_dropdown_neighbourhood,
             className="dropdown",
+            multi=True
         ),
         html.Br(),
         html.Br(),
@@ -94,12 +95,23 @@ card2 = dbc.Card(
             value="Day and Night",
             options=opt_dropdown_time,
             className="dropdown",
-        ),
+        )
     ],
     style={"width": "25rem", "marginLeft": 20},
     body=True,
     color="light",
 )
+
+# information
+card3 = dbc.Card(
+    [
+        html.H5("Information", className="text-dark"),
+        "Data used in this dashboard is sourced from the Vancouver Police Department at https://geodash.vpd.ca/opendata/. It has been filtered to only include incidents with location data from 2017 to 2021."
+        ],
+    style={"width": "25rem", "marginLeft": 20},
+    body=True,
+    color="light",
+        )
 
 """Layouts"""
 # Filter layout
@@ -113,6 +125,8 @@ filter_panel = [
     html.H4("Filters", style={"marginLeft": 20}),
     card2,
     html.Br(),
+    html.Br(),
+    card3
 ]
 
 # Plots layout
@@ -276,7 +290,7 @@ def plot_map_all(year):
 )
 def lineplot(time, neighbourhood):
     data = pd.read_csv("data/processed/processed_df.csv", index_col=0)
-    data = data[data["Neighborhood"] == neighbourhood]
+    data = data[data.Neighborhood.isin(neighbourhood)]
 
     if time == "Day":
         data = data[data["TIME"] == "day"]
@@ -314,7 +328,7 @@ def lineplot(time, neighbourhood):
 def barchart(neighbourhood, year):
     data = pd.read_csv("data/processed/processed_df.csv", index_col=0)
     data = data[data["YEAR"] == year]
-    data = data[data["Neighborhood"] == neighbourhood]
+    data = data[data.Neighborhood.isin(neighbourhood)]
     data = pd.DataFrame(
         data=data[["YEAR", "Type"]].value_counts(), columns=["Counts"]
     ).reset_index(level=["YEAR", "Type"])
@@ -355,7 +369,7 @@ def barchart(neighbourhood, year):
 def summary(neighbourhood, year):
     data = pd.read_csv("data/processed/processed_df.csv", index_col=0)
     data = data[data["YEAR"] == year]
-    data = data[data["Neighborhood"] == neighbourhood]
+    data = data[data.Neighborhood.isin(neighbourhood)]
     return len(data)
 
 
