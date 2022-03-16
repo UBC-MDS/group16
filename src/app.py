@@ -1,4 +1,5 @@
-from dash import Dash, html, Input, Output, dcc
+from tkinter.ttk import Style
+from dash import Dash, html, Input, Output, dcc, State
 import dash_bootstrap_components as dbc
 import pandas as pd
 import numpy as np
@@ -44,6 +45,24 @@ opt_radio_year = [
     {"label": "2021", "value": 2021},
 ]
 
+# Collapse button
+collapse = html.Div(
+    [
+        dbc.Button(
+            "Learn more",
+            id="collapse-button",
+            className="mb-3",
+            outline=False,
+            style={
+                "margin-top": "10px",
+                "width": "150px",
+                "background-color": "#E33B18",
+                "color": "white",
+            },
+        ),
+    ]
+)
+
 """Cards"""
 # Summary card
 card1 = dbc.Card(
@@ -71,10 +90,8 @@ card2 = dbc.Card(
             value=["Kitsilano"],
             options=opt_dropdown_neighbourhood,
             className="dropdown",
-            multi=True
+            multi=True,
         ),
-        html.Br(),
-        html.Br(),
         html.Br(),
         # Radio button for year
         html.H5("Year", className="text-dark"),
@@ -86,8 +103,6 @@ card2 = dbc.Card(
             labelStyle={"display": "in-block", "marginLeft": 20},
         ),
         html.Br(),
-        html.Br(),
-        html.Br(),
         # Dropdown for time
         html.H5("Time", className="text-dark"),
         dcc.Dropdown(
@@ -95,7 +110,7 @@ card2 = dbc.Card(
             value="Day and Night",
             options=opt_dropdown_time,
             className="dropdown",
-        )
+        ),
     ],
     style={"width": "25rem", "marginLeft": 20},
     body=True,
@@ -106,31 +121,43 @@ card2 = dbc.Card(
 card3 = dbc.Card(
     [
         html.H5("Information", className="text-dark"),
-        html.P("Data used in this dashboard is sourced from the Vancouver Police Department at:"),
+        html.P("Data used in this dashboard is sourced from"),
         dcc.Link(
-        href="https://geodash.vpd.ca/opendata/"
+            "Vancouver Police Department", href="https://geodash.vpd.ca/opendata/"
         ),
-        html.P("(It has been filtered to only include incidents with location data from 2017 to 2021.)")
-        ],
+        html.P(
+            "(It has been filtered to only include incidents with location data from 2017 to 2021.)"
+        ),
+    ],
     style={"width": "25rem", "marginLeft": 20},
     body=True,
     color="light",
-        )
+)
 
 """Layouts"""
 # Filter layout
 filter_panel = [
-    html.H2("Vancouver Crime Dashboard", style={"marginLeft": 20}),
-    html.Br(),
+    dbc.Row(
+        [
+            html.H2("Vancouver Crime Dashboard", style={"marginLeft": 20}),
+            dbc.Collapse(
+                html.P(
+                    """
+                Some text goes in here.""",
+                    style={"color": "#E33B18", "marginLeft": 20},
+                ),
+                id="collapse",
+            ),
+        ]
+    ),
+    dbc.Row([collapse], style={"marginLeft": 120}),
     html.Br(),
     card1,
-    html.Br(),
     html.Br(),
     html.H4("Filters", style={"marginLeft": 20}),
     card2,
     html.Br(),
-    html.Br(),
-    card3
+    card3,
 ]
 
 # Plots layout
@@ -375,6 +402,17 @@ def summary(neighbourhood, year):
     data = data[data["YEAR"] == year]
     data = data[data.Neighborhood.isin(neighbourhood)]
     return len(data)
+
+
+@app.callback(
+    Output("collapse", "is_open"),
+    [Input("collapse-button", "n_clicks")],
+    [State("collapse", "is_open")],
+)
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
 
 
 if __name__ == "__main__":
