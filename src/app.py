@@ -146,11 +146,10 @@ filter_panel = [
             dbc.Collapse(
                 html.P(
                     """
-                The filter panel below helps you filter the crimes. 
-                The neighborhood can accept multiple options and updates the bar chart and the line graph.
-                The year will update the bar chart and the map so they show the crimes for the year specified.
-                The time which has three options will aggregate the line gragh by time of the day. 
-                The card represents the number of crimes for the specified year and neighbourhood.""",
+                The filter panel below helps you filter the plots. The neighborhood filter can accept multiple options and 
+                updates the bar chart and the line graph. The year filter will update the bar chart and the map so they 
+                show the crimes for the year specified. The time filter which has three options will aggregate the line graph 
+                by time of the day. The summary card represents the number of crimes for the specified year and neighbourhood.""",
                     style={"marginLeft": 20},
                 ),
                 id="collapse",
