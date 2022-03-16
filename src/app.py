@@ -147,8 +147,12 @@ filter_panel = [
             dbc.Collapse(
                 html.P(
                     """
-                Some text goes in here.""",
-                    style={"color": "#E33B18", "marginLeft": 20},
+                The filter panel below helps you filter the crimes. 
+                The neighborhood can accept multiple options and updates the bar chart and the line graph.
+                The year will update the bar chart and the map so they show the crimes for the year specified.
+                The time which has three options will aggregate the line gragh by time of the day. 
+                The card represents the number of crimes for the specified year and neighbourhood.""",
+                    style={"marginLeft": 20},
                 ),
                 id="collapse",
             ),
