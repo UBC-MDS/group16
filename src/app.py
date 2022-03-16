@@ -106,7 +106,11 @@ card2 = dbc.Card(
 card3 = dbc.Card(
     [
         html.H5("Information", className="text-dark"),
-        "Data used in this dashboard is sourced from the Vancouver Police Department at https://geodash.vpd.ca/opendata/. It has been filtered to only include incidents with location data from 2017 to 2021."
+        html.P("Data used in this dashboard is sourced from the Vancouver Police Department at:"),
+        dcc.Link(
+        href="https://geodash.vpd.ca/opendata/"
+        ),
+        html.P("(It has been filtered to only include incidents with location data from 2017 to 2021.)")
         ],
     style={"width": "25rem", "marginLeft": 20},
     body=True,
