@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import altair as alt
 import geopandas as gpd
-import utm
 
 alt.data_transformers.disable_max_rows()
 
@@ -238,45 +237,54 @@ app.layout = html.Div(id="main", className="app", children=page_layout)
 
 """Functions"""
 
-
-def prep_data(df):
-    # eliminate data sets without coordenates
-    df = df[df["HUNDRED_BLOCK"] != "OFFSET TO PROTECT PRIVACY"]
-    df.reset_index(drop=True, inplace=True)
-    # rename columns
-    df = df.rename(columns={"NEIGHBOURHOOD": "Neighborhood", "TYPE": "Type"})
-    # convert coordenates
-    pp_df = df.copy()
-    pp_df.loc[:, "lat"], pp_df.loc[:, "lon"] = utm.to_latlon(
-        pp_df["X"], pp_df["Y"], 10, "n", strict=False
-    )
-    return pp_df
-
-
-def load_nb():
-    nb = pd.read_csv(r"data/van_neighbourhoods.csv", sep=";")
-    nb["geo_point_2d"] = nb["geo_point_2d"].apply(
-        lambda x: np.fromstring(x, dtype=np.double, sep=",")
-    )
-    nb[["nb_lat", "nb_lon"]] = pd.DataFrame(
-        nb["geo_point_2d"].to_list(), columns=["nb_lat", "nb_lon"]
-    )
-    nb = nb.rename(columns={"Name": "Neighborhood"})
-    nb.loc[nb.Neighborhood == "Arbutus-Ridge", "Neighborhood"] = "Arbutus Ridge"
-    nb.loc[nb.Neighborhood == "Downtown", "Neighborhood"] = "Central Business District"
-    return nb[["Neighborhood", "nb_lat", "nb_lon"]]
-
-
-def load_gdf():
-    gdf = gpd.read_file("data/van_spatial_data")
-    return gdf
-
-
 @app.callback(
     Output("map_plot", "srcDoc"),
     Input("year_radio", "value"),
 )
 def plot_map_all(year):
+    url = "https://raw.githubusercontent.com/UBC-MDS/vancouver_crime_dashboard/main/data/van_nb.geojson"
+    geoj = alt.Data(url=url, format=alt.DataFormat(property="features", type="json"))
+    df = pd.read_csv(r"data/processed/processed_df.csv")
+    df = df[df.YEAR == year] 
+    df = df[df["HUNDRED_BLOCK"] != "OFFSET TO PROTECT PRIVACY"]
+    df = df.rename(columns={"NEIGHBOURHOOD": "Neighborhood", "TYPE": "Type"})
+    df = df.groupby("Neighborhood").size().reset_index(name="Crimes")
+    base = (
+        alt.Chart(geoj)
+        .mark_geoshape(fill=None)
+        .project(type="identity", reflectY=True)
+    )
+    pts = (
+        base
+        + alt.Chart(df, title="Number of Crimes per Neighbourhood")
+        .transform_lookup(
+            default="0",
+            as_="geo",
+            lookup="Neighborhood",
+            from_=alt.LookupData(data=geoj, key="properties.name"),
+        )
+        .mark_geoshape()
+        .encode(
+            alt.Color(
+                "Crimes",
+                scale=alt.Scale(scheme="yelloworangered"),
+                legend=alt.Legend(orient="right", title="Crimes"),
+            ),
+            alt.Shape(field="geo", type="geojson"),
+            tooltip=["Crimes", "Neighborhood:N"],
+        )
+    ).project(type="identity", reflectY=True)
+    map = (
+        (base + pts)
+        .configure_title(fontSize=20)
+        .configure_legend(
+            titleFontSize=16,
+            labelFontSize=14,
+        )
+    )
+
+    return map.to_html()  
+"""def plot_map_all(year):
     # load Van crime data
     filename = "data/processed/merged_df.csv"
     df = pd.read_csv(filename, index_col=0)
@@ -318,7 +326,7 @@ def plot_map_all(year):
         )
     )
     return map.to_html()
-
+"""
 
 @app.callback(
     Output("line_plot", "srcDoc"),
