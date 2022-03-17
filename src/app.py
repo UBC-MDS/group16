@@ -380,6 +380,10 @@ def barchart(neighbourhood, year):
 
     barchart = (
         alt.Chart(data, title="Crimes by Type")
+        .transform_window(
+            rank="rank(Counts)", sort=[alt.SortField("Counts", order="descending")]
+        )
+        .transform_filter((alt.datum.rank <= 5))
         .mark_bar()
         .encode(
             y=alt.Y(
@@ -392,17 +396,13 @@ def barchart(neighbourhood, year):
             ),
             tooltip=alt.Tooltip(["Type", "Counts"]),
         )
-        .transform_window(
-            rank="rank(COUNTS)", sort=[alt.SortField("COUNTS", order="descending")]
-        )
-        .transform_filter((alt.datum.rank < 15))
         .configure_axis(labelFontSize=14, titleFontSize=16)
         .configure_legend(
-            titleFontSize=16,
-            labelFontSize=14,
+            titleFontSize=14,
+            labelFontSize=10,
         )
         .configure_title(fontSize=20)
-        .properties(width=300, height=300)
+        .properties(width=400, height=300)
     )
     return barchart.to_html()
 
