@@ -7,7 +7,7 @@ Safety is an important factor for consideration when choosing a place to live. V
 
 ## Description of the dashboard
 
-https://user-images.githubusercontent.com/90230188/158814716-e320e6a2-df5d-427e-957e-991dac477a1e.mp4
+https://user-images.githubusercontent.com/90230188/158815583-09aac709-6e67-4048-8580-f8a3385c5bdf.mp4
 
 The Vancouver crime statistics dashboard displays criminal incidents that occurred over the past 5 years under the Vancouver Police Department jurisdiction.
 
@@ -15,7 +15,7 @@ On the left, there is a panel that enables filtering the data by neighbourhood a
 
 Right above the filtering panel, on the top-left corner, there is a summary statistic that shows the total number of crimes for the user-selected neighbourhood and year.
 
-A bar chart depicts the count of crimes by type, based on the global criteria mentioned above, enabling analysis of most frequent crimes by neighbourhood.
+A bar chart depicts the top 5 count of crimes by type, based on the global criteria mentioned above, enabling analysis of most frequent crimes by neighbourhood.
 
 The map of Vancouver is presented in the right upper corner, with its corresponding number of crimes in the selected year by neighbourhood as circles. As the number of crimes increases, the size of the circles also increases. Additionally, the map shows the number of crimes as a tooltip when the user hovers over different areas of the city.
 
