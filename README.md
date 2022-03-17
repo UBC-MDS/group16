@@ -46,3 +46,7 @@ Please note that this project is released with a Code of Conduct. By contributin
 This dashboard was created by Cici Du, Melisa Maidana, Paniz Fazlali, Shi Yan Wang (DSCI 532 - Group 16).
 
 It is licensed under the terms of the MIT license.
+
+### Attributions
+
+The [logo](https://thenounproject.com/icon/police-hat-810000/) of this project has been created by Aldric Rodriguez from Noun Project. 
