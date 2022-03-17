@@ -379,7 +379,7 @@ def barchart(neighbourhood, year):
     ).reset_index(level=["YEAR", "Type"])
 
     barchart = (
-        alt.Chart(data, title="Crimes by Type")
+        alt.Chart(data, title="Crimes by Type (Top 5)")
         .transform_window(
             rank="rank(Counts)", sort=[alt.SortField("Counts", order="descending")]
         )
@@ -398,11 +398,11 @@ def barchart(neighbourhood, year):
         )
         .configure_axis(labelFontSize=14, titleFontSize=16)
         .configure_legend(
-            titleFontSize=14,
-            labelFontSize=10,
+            titleFontSize=16,
+            labelFontSize=14,
         )
         .configure_title(fontSize=20)
-        .properties(width=400, height=300)
+        .properties(width=400, height=200)
     )
     return barchart.to_html()
 
