@@ -387,7 +387,8 @@ def barchart(neighbourhood, year):
             ),
             x=alt.Y("Counts", title="Number of Crimes"),
             color=alt.Color(
-                "Type", scale=alt.Scale(scheme="yelloworangered"), title="Type"
+                "Type", scale=alt.Scale(scheme="yelloworangered"), title="Type",
+                legend=alt.Legend(orient="bottom", columns=3)
             ),
             tooltip=alt.Tooltip(["Type", "Counts"]),
         )
