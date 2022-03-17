@@ -382,10 +382,10 @@ def barchart(neighbourhood, year):
         alt.Chart(data, title="Crimes by Type")
         .mark_bar()
         .encode(
-            x=alt.X(
-                "Type", sort="-y", axis=alt.Axis(labels=False), title="Type of Crime"
+            y=alt.Y(
+                "Type", sort="-x", axis=alt.Axis(labels=False), title="Type of Crime"
             ),
-            y=alt.Y("Counts", title="Number of Crimes"),
+            x=alt.Y("Counts", title="Number of Crimes"),
             color=alt.Color(
                 "Type", scale=alt.Scale(scheme="yelloworangered"), title="Type"
             ),
