@@ -53,7 +53,7 @@ collapse = html.Div(
             outline=False,
             style={
                 "margin-top": "10px",
-                "width": "150px",
+                "width": "110px",
                 "background-color": "#E33B18",
                 "color": "white",
             },
@@ -67,13 +67,13 @@ card1 = dbc.Card(
     [
         # Summary statistics
         html.H4(
-            "Total Number of Crimes", className="card-title", style={"marginLeft": 50}
+            "Total Number of Crimes", className="card-title", style={"marginLeft": 20}
         ),
         html.Div(
-            id="summary", style={"color": "#E33B18", "fontSize": 25, "marginLeft": 140}
+            id="summary", style={"color": "#E33B18", "fontSize": 20, "marginLeft": 140}
         ),
     ],
-    style={"width": "25rem", "marginLeft": 20},
+    style={"width": "20rem", "marginLeft": 20},
     body=True,
     color="light",
 )
@@ -110,7 +110,7 @@ card2 = dbc.Card(
             className="dropdown",
         ),
     ],
-    style={"width": "25rem", "marginLeft": 20},
+    style={"width": "20rem", "marginLeft": 20},
     body=True,
     color="light",
 )
@@ -131,7 +131,7 @@ card3 = dbc.Card(
             ]
         ),
     ],
-    style={"width": "25rem", "marginLeft": 20},
+    style={"width": "20rem", "marginLeft": 20},
     body=True,
     color="light",
 )
@@ -145,9 +145,9 @@ filter_panel = [
             dbc.Collapse(
                 html.P(
                     """
-                The filter panel below helps you filter the plots. The neighborhood filter can accept multiple options and 
-                updates the bar chart and the line graph. The year filter will update the bar chart and the map so they 
-                show the crimes for the year specified. The time filter which has three options will aggregate the line graph 
+                The filter panel below helps you filter the plots. The neighborhood filter can accept multiple options and
+                updates the bar chart and the line graph. The year filter will update the bar chart and the map so they
+                show the crimes for the year specified. The time filter which has three options will aggregate the line graph
                 by time of the day. The summary card represents the number of crimes for the specified year and neighbourhood.""",
                     style={"marginLeft": 20},
                 ),
@@ -245,7 +245,7 @@ def plot_map_all(year):
     url = "https://raw.githubusercontent.com/UBC-MDS/vancouver_crime_dashboard/main/data/van_nb.geojson"
     geoj = alt.Data(url=url, format=alt.DataFormat(property="features", type="json"))
     df = pd.read_csv(r"data/processed/processed_df.csv")
-    df = df[df.YEAR == year] 
+    df = df[df.YEAR == year]
     df = df[df["HUNDRED_BLOCK"] != "OFFSET TO PROTECT PRIVACY"]
     df = df.rename(columns={"NEIGHBOURHOOD": "Neighborhood", "TYPE": "Type"})
     df = df.groupby("Neighborhood").size().reset_index(name="Crimes")
@@ -280,10 +280,10 @@ def plot_map_all(year):
         .configure_legend(
             titleFontSize=16,
             labelFontSize=14,
-        )
+        ).properties(width=380, height=200)
     )
+    return map.to_html()
 
-    return map.to_html()  
 """def plot_map_all(year):
     # load Van crime data
     filename = "data/processed/merged_df.csv"
@@ -359,7 +359,7 @@ def lineplot(time, neighbourhood):
             labelFontSize=14,
         )
         .configure_title(fontSize=20)
-        .properties(width=1000, height=300)
+        .properties(width=870, height=270)
     )
 
     return line_plot.to_html()
