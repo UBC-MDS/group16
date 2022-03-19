@@ -17,7 +17,8 @@ From the feedback, we have made major improvements on the following
 - Changed the Neighbourhood filter from the dropdown list to a collapse button, allowing users to select multiple neighbourhoods simultaneously.
 - Updated the map from circles to a choropleth map. The colour (from yellow to red) represents the crime counts from low to high.
 - Switched the _Crimes by Type_ bar chart from displaying all crime types to the top 5. 
-- Updated the favicon to better fit the usage scenario
+- Updated the favicon to better fit the usage scenario.
+- Resized the dashboard to have it rendered appropriately at 100% zoom level.
 
 ### Future Plans
 
