@@ -17,17 +17,12 @@ From the feedback, we have made major improvements on the following
 - Changed the Neighbourhood filter from the dropdown list to a collapse button, allowing users to select multiple neighbourhoods simultaneously.
 - Updated the map from circles to a choropleth map. The colour (from yellow to red) represents the crime counts from low to high.
 - Switched the _Crimes by Type_ bar chart from displaying all crime types to the top 5. 
-- Updated the favicon to better fit the usage scenario
-
-### Limitations and Improvements on DashR
-
-We strived to create DashR and DashPy to deliver the exact visualization and functionalities. However, we faced difficulties pushing the DashR to Heroku due to package incompatibility for the map component. 
-
-To solve the problem, we took the advice from Florencia to provide instructions on how to access the DashR locally, given the time constraints. We have planned to explore more DashR options for map visualizations with other packages for the next step.
+- Updated the favicon to better fit the usage scenario.
+- Resized the dashboard to have it rendered appropriately at 100% zoom level.
 
 ### Future Plans
 
 There are some functionalities we plan for the future advance
 
 1. The dashboard focuses on neighbouhoods statistics while users may also be interested in the overall crime status of Vancouver city. We can add Vancouver-all as an option that allows users to understand the general crime trends and compare them with neighbourhhods. 
-2. Due to privacy concerns, we did not collaborate with the geospatial information from the dataset. However, we can potentially narrow the selection by breaking neighbourhood into blocks, which could help users for better location decisions. 
+2. Due to privacy concerns, we did not collaborate with the geospatial information from the dataset. We can potentially visualize the information with the map. In addition, we can explore other map options to make it more interactive and nice-looking.
